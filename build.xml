@@ -41,7 +41,7 @@
         <description description="takes git.rep.url and git.rep.name as parameters"/>
     </target>
     <target name="properties">
-        <property name="kotlin.version" value="1.2-Beta-eap-28"/>
+        <property name="kotlin.version" value="%kotlin.version%"/>
         <property name="changer.version" value="0.0.3-4"/>
         <condition property="exeEnding" value=".bat" else="">
             <os family="windows"/>
