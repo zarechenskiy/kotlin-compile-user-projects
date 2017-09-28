@@ -26,25 +26,33 @@
             <arg value="DEV"/>
         </exec>
     </target>
-    <target name="oneRepBuilding" depends="oneRepKotlinVersionChanging">
-        <property name="gradle.executable" value="${basedir}/${git.rep.name}/gradlew${exeEnding}"/>
+    <target name="generateRunGradleWin" if="isWindows" depends="oneRepKotlinVersionChanging">
+        <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
+        <echo file="${run.gradlew}">call gradlew.bat ${git.rep.cmd}</echo>
+    </target>
+    <target name="generateRunGradleLin" unless="isWindows" depends="oneRepKotlinVersionChanging">
+        <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
+        <echo file="${run.gradlew}">#!/usr/bin/env bash
+            ./gradlew ${git.rep.cmd}</echo>
         <antcall target="makeExecutableOnLinux">
-            <param name="param.executable" value="${gradle.executable}"/>
+            <param name="param.executable" value="${run.gradlew}"/>
         </antcall>
-        <echo message="going to build the gradle project"/>
-        <exec dir="${git.rep.name}/" executable="${gradle.executable}">
-            <arg value="clean"/>
-            <arg value="build"/>
-        </exec>
+    </target>
+    <target name="oneRepBuilding" depends="generateRunGradleLin, generateRunGradleWin">
+        <exec dir="${git.rep.name}/" executable="${run.gradlew}" output="stdout.txt" error="stderr.txt" resultproperty="gradle.result"/>
+        <echo message="Result of executing gradle commands ${git.rep.cmd} is ${gradle.result}"/>
     </target>
     <target name="processOneRepository" depends="oneRepBuilding">
-        <description description="takes git.rep.url and git.rep.name as parameters"/>
+        <description description="takes git.rep.url.start, git.rep.name and git.rep.cmd as parameters"/>
     </target>
     <target name="properties">
-        <property name="kotlin.version" value="%kotlin.version%"/>
+        <property name="kotlin.version" value="1.2-Beta-eap-28"/>
         <property name="changer.version" value="0.0.3-4"/>
-        <condition property="exeEnding" value=".bat" else="">
+        <condition property="isWindows" value="true">
             <os family="windows"/>
+        </condition>
+        <condition property="exeEnding" value=".bat" else="">
+            <isset property="isWindows"/>
         </condition>
         <property name="changer.zip.name" value="kotlin-version-changer-${changer.version}.zip"/>
         <property name="changer.url" value="https://github.com/h0tk3y/kotlin-version-changer/releases/download/${changer.version}/${changer.zip.name}"/>
@@ -68,6 +76,7 @@
         <antcall target="processOneRepository">
             <param name="git.rep.name" value="kotlin-version-changer"/>
             <param name="git.rep.url.start" value="https://github.com/h0tk3y"/>
+            <param name="git.rep.cmd" value="clean build"/>
         </antcall>
     </target>
     <target name="start" depends="processRepositories">
