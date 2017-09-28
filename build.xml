@@ -1,0 +1,85 @@
+<project name="antInstall" basedir="." default="start">
+    <target name="makeExecutableOnLinux" >
+        <!-- takes param.executable as parameter - full path the file whose permissions are going to be changed -->
+        <echo message="Going to make ${param.executable} executable"/>
+        <exec dir="." executable="chmod" osfamily="unix" >
+            <arg value="777"/>
+            <arg value="${param.executable}"/>
+        </exec>
+    </target>
+    <target name="oneRepClone">
+        <echo message="git.rep.name = ${git.rep.name}"/>
+        <property name="git.rep.url" value="${git.rep.url.start}/${git.rep.name}.git"/>
+        <echo message="git.rep.url = ${git.rep.url}"/>
+        <delete dir="${git.rep.name}"  failonerror="false"/>
+        <mkdir dir="${git.rep.name}"/>
+        <echo message="going to clone repository ${git.rep.url}"/>
+        <exec dir="." executable="git">
+            <arg value="clone"/>
+            <arg value="${git.rep.url}"/>
+            <arg value="${git.rep.name}" />
+        </exec>
+    </target>
+    <target name="oneRepKotlinVersionChanging" depends="oneRepClone">
+        <echo message="going to patch build.gradle with kotlin version ${kotlin.version}"/>
+        <exec dir="." executable="${changer.executable}" >
+            <arg value="--project"/>
+            <arg value="${git.rep.name}"/>
+            <arg value="--version"/>
+            <arg value="${kotlin.version}"/>
+            <arg value="--repository"/>
+            <arg value="DEV"/>
+        </exec>
+    </target>
+    <target name="oneRepBuilding" depends="oneRepKotlinVersionChanging">
+        <property name="gradle.executable" value="${basedir}/${git.rep.name}/gradlew${exeEnding}"/>
+        <echo message="going to set up executable permissions for gradlew"/>
+        <antcall target="makeExecutableOnLinux">
+            <param name="param.executable" value="${gradle.executable}"/>
+        </antcall>
+        <echo message="going to build the gradle project"/>
+        <exec dir="${git.rep.name}/" executable="${gradle.executable}">
+            <arg value="clean"/>
+            <arg value="build"/>
+        </exec>
+    </target>
+    <!-- takes git.rep.url and git.rep.name as parameters -->
+    <target name="processOneRepository" depends="oneRepBuilding"/>
+    <target name="properties">
+        <property name="kotlin.version" value="1.2-Beta-eap-28"/>
+        <property name="changer.version" value="0.0.3-4"/>
+        <condition property="exeEnding" value=".bat" else="">
+            <os family="windows"/>
+        </condition>
+        <echo message="exeEnding = ${exeEnding}"/>
+        <property name="changer.zip.name" value="kotlin-version-changer-${changer.version}.zip"/>
+        <property name="changer.url" value="https://github.com/h0tk3y/kotlin-version-changer/releases/download/${changer.version}/${changer.zip.name}"/>
+        <property name="changer.local.path" value="kotlin-version-changer-${changer.version}/bin"/>
+        <property name="changer.executable.name" value="kotlin-version-changer${exeEnding}"/>
+        <property name="changer.executable" value="${basedir}/${changer.local.path}/${changer.executable.name}"/>
+    </target>
+    <target name="detectIfChangerDownloaded" depends="properties">
+        <available property="isChangerDownloaded" file="${changer.zip.name}"/>
+    </target>
+    <target name="downloadChanger" depends="detectIfChangerDownloaded" unless="isChangerDownloaded">
+        <echo message="going to download ${changer.url}"/>
+        <get src="${changer.url}" dest="."/>
+    </target>
+    <target name="unzipChanger" depends="downloadChanger">
+        <echo message="going to unzip ${changer.zip.name}"/>
+        <unzip src="${changer.zip.name}" dest="." overwrite="true"/>
+        <antcall target="makeExecutableOnLinux">
+            <param name="param.executable" value="${changer.executable}"/>
+        </antcall>
+    </target>
+    <target name="processRepositories" depends="unzipChanger">
+        <echo message="going to process kotlin-version-changer"/>
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="kotlin-version-changer"/>
+            <param name="git.rep.url.start" value="https://github.com/h0tk3y"/>
+        </antcall>
+    </target>
+    <target name="start" depends="processRepositories">
+        <echo message="start"/>
+    </target>
+</project>
