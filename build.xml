@@ -11,8 +11,15 @@
             Taken parameters are:
             git.rep.name = ${git.rep.name}
             git.rep.url.start = ${git.rep.url.start}
+            git.rep.branch = ${git.rep.branch}
             git.rep.cmd = ${git.rep.cmd}
         </echo>
+    </target>
+    <target name="oneRepCheckoutBranch" if="git.rep.branch">
+        <exec dir="${git.rep.name}/" executable="git">
+            <arg value="checkout"/>
+            <arg value="${git.rep.branch}"/>
+        </exec>
     </target>
     <target name="oneRepClone" depends="oneRepProperties">
         <property name="git.rep.url" value="${git.rep.url.start}/${git.rep.name}.git"/>
@@ -23,6 +30,7 @@
             <arg value="${git.rep.url}"/>
             <arg value="${git.rep.name}" />
         </exec>
+        <antcall target="oneRepCheckoutBranch"/>
     </target>
     <target name="oneRepKotlinVersionChanging" depends="oneRepClone">
         <exec dir="." executable="${changer.executable}" >
@@ -108,7 +116,14 @@
         <antcall target="processOneRepository">
             <param name="git.rep.name" value="kotlin-version-changer"/>
             <param name="git.rep.url.start" value="https://github.com/h0tk3y"/>
+            <!--<param name="git.rep.branch" value=""/>-->
             <param name="git.rep.cmd" value="clean build"/>
+        </antcall>
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="corda"/>
+            <param name="git.rep.url.start" value="https://github.com/corda"/>
+            <param name="git.rep.branch" value="release-M14"/>
+            <param name="git.rep.cmd" value="clean"/>
         </antcall>
     </target>
 </project>
