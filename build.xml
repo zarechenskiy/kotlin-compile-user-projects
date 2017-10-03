@@ -39,7 +39,7 @@
         </antcall>
     </target>
     <target name="oneRepBuilding" depends="generateRunGradleLin, generateRunGradleWin">
-        <exec dir="${git.rep.name}/" executable="${run.gradlew}" output="stdout.txt" error="stderr.txt" resultproperty="gradle.result"/>
+        <exec dir="${git.rep.name}/" executable="${run.gradlew}" output="${basedir}/logs/${git.rep.name}-stdout.txt" error="${basedir}/logs/${git.rep.name}-stderr.txt" resultproperty="gradle.result"/>
         <echo message="Result of executing gradle commands ${git.rep.cmd} is ${gradle.result}"/>
     </target>
     <target name="processOneRepository" depends="oneRepBuilding">
