@@ -44,7 +44,7 @@
     </target>
     <target name="generateRunGradleWin" if="isWindows" depends="oneRepKotlinVersionChanging">
         <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
-        <echo file="${run.gradlew}">call gradlew.bat ${git.rep.cmd}</echo>
+        <echo file="${run.gradlew}">call gradlew.bat ${git.rep.cmd} --stacktrace --info</echo>
         <replace file="${run.gradlew}" token="&quot;"/>
         <concat>
             <file name="${run.gradlew}"/>
@@ -56,7 +56,7 @@
         </antcall>
         <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
         <echo file="${run.gradlew}">#!/usr/bin/env bash
-./gradlew ${git.rep.cmd}</echo>
+./gradlew ${git.rep.cmd} --stacktrace --info</echo>
         <replace file="${run.gradlew}" token="&quot;"/>
         <concat>
             <file name="${run.gradlew}"/>
