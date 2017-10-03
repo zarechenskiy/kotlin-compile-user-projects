@@ -39,8 +39,16 @@
         </antcall>
     </target>
     <target name="oneRepBuilding" depends="generateRunGradleLin, generateRunGradleWin">
-        <exec dir="${git.rep.name}/" executable="${run.gradlew}" output="${basedir}/logs/${git.rep.name}-stdout.txt" error="${basedir}/logs/${git.rep.name}-stderr.txt" resultproperty="gradle.result"/>
+        <property name="stdout" value="${logs.path}/${git.rep.name}-stdout.txt"/>
+        <property name="stderr" value="${logs.path}/${git.rep.name}-stderr.txt"/>
+        <exec dir="${git.rep.name}/" executable="${run.gradlew}" output="${stdout}" error="${stderr}" resultproperty="gradle.result"/>
         <echo message="Result of executing gradle commands ${git.rep.cmd} is ${gradle.result}"/>
+        <concat>
+            <file name="${stdout}"/>
+        </concat>
+        <concat>
+            <file name="${stderr}"/>
+        </concat>
     </target>
     <target name="processOneRepository" depends="oneRepBuilding">
         <description description="takes git.rep.url.start, git.rep.name and git.rep.cmd as parameters"/>
@@ -59,6 +67,9 @@
         <property name="changer.local.path" value="kotlin-version-changer-${changer.version}/bin"/>
         <property name="changer.executable.name" value="kotlin-version-changer${exeEnding}"/>
         <property name="changer.executable" value="${basedir}/${changer.local.path}/${changer.executable.name}"/>
+        <property name="logs.folder" value="logs"/>
+        <property name="logs.path" value="${basedir}/${logs.folder}"/>
+        <mkdir dir="${logs.path}"/>
     </target>
     <target name="detectIfChangerDownloaded" depends="properties">
         <available property="isChangerDownloaded" file="${changer.zip.name}"/>
