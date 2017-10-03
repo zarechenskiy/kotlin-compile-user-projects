@@ -83,10 +83,12 @@
             <param name="param.executable" value="${changer.executable}"/>
         </antcall>
     </target>
-    <!-- Sample how to run processOneRepository task -->
-    <!--<antcall target="processOneRepository">-->
-    <!--<param name="git.rep.name" value="kotlin-version-changer"/>-->
-    <!--<param name="git.rep.url.start" value="https://github.com/h0tk3y"/>-->
-    <!--<param name="git.rep.cmd" value="clean build"/>-->
-    <!--</antcall>-->
+    <target  name="runSample">
+        <!-- Sample how to run processOneRepository task -->
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="kotlin-version-changer"/>
+            <param name="git.rep.url.start" value="https://github.com/h0tk3y"/>
+            <param name="git.rep.cmd" value="clean build"/>
+        </antcall>
+    </target>
 </project>
