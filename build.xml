@@ -6,7 +6,15 @@
             <arg value="${param.executable}"/>
         </exec>
     </target>
-    <target name="oneRepClone" depends="properties">
+    <target name="oneRepProperties" depends="commonProperties">
+        <echo>
+            Taken parameters are:
+            git.rep.name = ${git.rep.name}
+            git.rep.url.start = ${git.rep.url.start}
+            git.rep.cmd = ${git.rep.cmd}
+        </echo>
+    </target>
+    <target name="oneRepClone" depends="oneRepProperties">
         <property name="git.rep.url" value="${git.rep.url.start}/${git.rep.name}.git"/>
         <delete dir="${git.rep.name}"  failonerror="false"/>
         <mkdir dir="${git.rep.name}"/>
@@ -59,7 +67,7 @@
     <target name="processOneRepository" depends="oneRepBuilding">
         <description description="takes git.rep.url.start, git.rep.name and git.rep.cmd as parameters"/>
     </target>
-    <target name="properties">
+    <target name="commonProperties">
         <property name="kotlin.version" value="1.2-Beta-eap-28"/>
         <property name="changer.version" value="0.0.3-4"/>
         <condition property="isWindows" value="true">
@@ -77,7 +85,7 @@
         <property name="logs.path" value="${basedir}/${logs.folder}"/>
         <mkdir dir="${logs.path}"/>
     </target>
-    <target name="detectIfChangerDownloaded" depends="properties">
+    <target name="detectIfChangerDownloaded" depends="commonProperties">
         <available property="isChangerDownloaded" file="${changer.zip.name}"/>
     </target>
     <target name="downloadChanger" depends="detectIfChangerDownloaded" unless="isChangerDownloaded">
