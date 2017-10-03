@@ -1,4 +1,4 @@
-<project name="antInstall" basedir="." default="start">
+<project name="antInstall" basedir="." default="unzipChanger">
     <target name="makeExecutableOnLinux" >
         <description description="takes param.executable as parameter - full path the file whose permissions are going to be changed"/>
         <exec dir="." executable="chmod" osfamily="unix" >
@@ -6,7 +6,7 @@
             <arg value="${param.executable}"/>
         </exec>
     </target>
-    <target name="oneRepClone">
+    <target name="oneRepClone" depends="properties">
         <property name="git.rep.url" value="${git.rep.url.start}/${git.rep.name}.git"/>
         <delete dir="${git.rep.name}"  failonerror="false"/>
         <mkdir dir="${git.rep.name}"/>
@@ -72,14 +72,10 @@
             <param name="param.executable" value="${changer.executable}"/>
         </antcall>
     </target>
-    <target name="processRepositories" depends="unzipChanger">
-        <antcall target="processOneRepository">
-            <param name="git.rep.name" value="kotlin-version-changer"/>
-            <param name="git.rep.url.start" value="https://github.com/h0tk3y"/>
-            <param name="git.rep.cmd" value="clean build"/>
-        </antcall>
-    </target>
-    <target name="start" depends="processRepositories">
-        <echo message="start"/>
-    </target>
+    <!-- Sample how to run processOneRepository task -->
+    <!--<antcall target="processOneRepository">-->
+    <!--<param name="git.rep.name" value="kotlin-version-changer"/>-->
+    <!--<param name="git.rep.url.start" value="https://github.com/h0tk3y"/>-->
+    <!--<param name="git.rep.cmd" value="clean build"/>-->
+    <!--</antcall>-->
 </project>
