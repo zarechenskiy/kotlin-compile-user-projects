@@ -45,16 +45,13 @@
         <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
         <echo file="${run.gradlew}">#!/usr/bin/env bash
 ./gradlew ${git.rep.cmd}</echo>
-        <antcall target="makeExecutableOnLinux">
-            <param name="param.executable" value="${run.gradlew}"/>
-        </antcall>
-        <concat>
-            <file name="${run.gradlew}"/>
-        </concat>
         <replace file="${run.gradlew}" token="&quot;"/>
         <concat>
             <file name="${run.gradlew}"/>
         </concat>
+        <antcall target="makeExecutableOnLinux">
+            <param name="param.executable" value="${run.gradlew}"/>
+        </antcall>
     </target>
     <target name="oneRepBuilding" depends="generateRunGradleLin, generateRunGradleWin">
         <property name="stdout" value="${logs.path}/${git.rep.name}-stdout.txt"/>
