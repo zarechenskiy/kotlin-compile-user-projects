@@ -31,6 +31,9 @@
         <echo file="${run.gradlew}">call gradlew.bat ${git.rep.cmd}</echo>
     </target>
     <target name="generateRunGradleLin" unless="isWindows" depends="oneRepKotlinVersionChanging">
+        <antcall target="makeExecutableOnLinux">
+            <param name="param.executable" value="${basedir}/${git.rep.name}/gradlew"/>
+        </antcall>
         <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
         <echo file="${run.gradlew}">#!/usr/bin/env bash
             ./gradlew ${git.rep.cmd}</echo>
