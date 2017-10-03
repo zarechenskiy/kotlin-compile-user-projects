@@ -51,6 +51,10 @@
         <concat>
             <file name="${run.gradlew}"/>
         </concat>
+        <replace file="${run.gradlew}" token="&quot;"/>
+        <concat>
+            <file name="${run.gradlew}"/>
+        </concat>
     </target>
     <target name="oneRepBuilding" depends="generateRunGradleLin, generateRunGradleWin">
         <property name="stdout" value="${logs.path}/${git.rep.name}-stdout.txt"/>
