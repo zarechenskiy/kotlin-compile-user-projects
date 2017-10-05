@@ -1,4 +1,4 @@
-<project name="antInstall" basedir="." default="unzipChanger">
+<project name="antInstall" basedir="." default="runSample">
     <target name="makeExecutableOnLinux" >
         <description description="takes param.executable as parameter - full path the file whose permissions are going to be changed"/>
         <exec dir="." executable="chmod" osfamily="unix" >
