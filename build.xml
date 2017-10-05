@@ -77,7 +77,7 @@
             <file name="${stderr}"/>
         </concat>
     </target>
-    <target name="processOneRepository" depends="oneRepBuilding">
+    <target name="processOneRepository" depends="oneRepKotlinVersionChanging">
         <description description="takes git.rep.url.start, git.rep.name and git.rep.cmd as parameters"/>
     </target>
     <target name="commonProperties">
