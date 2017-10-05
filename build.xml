@@ -126,4 +126,10 @@
             <param name="git.rep.cmd" value="clean"/>
         </antcall>
     </target>
+    <antcall target="processOneRepository">
+        <param name="git.rep.name" value="lwjgl3"/>
+        <param name="git.rep.url.start" value="https://github.com/LWJGL"/>
+        <param name="git.rep.branch" value=""/>
+        <param name="git.rep.cmd" value="clean build"/>
+    </antcall>
 </project>
