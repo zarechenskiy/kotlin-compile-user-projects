@@ -111,7 +111,7 @@
             <param name="param.executable" value="${changer.executable}"/>
         </antcall>
     </target>
-    <target  name="runSample">
+    <target  name="runSample" depends="unzipChanger">
         <!-- Sample how to run processOneRepository task -->
         <antcall target="processOneRepository">
             <param name="git.rep.name" value="kotlin-version-changer"/>
