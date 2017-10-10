@@ -79,6 +79,13 @@
             <file name="${stderr}"/>
         </concat>
     </target>
+    <target name="cleanup">
+        <description>
+            Following parameters are expected:
+            - git.rep.name - name of the removed folder
+        </description>
+        <delete dir="${git.rep.name}"  failonerror="false"/>
+    </target>
     <target name="runGradleW" depends="oneRepBuilding">
         <description>
             Following properties are taken from parent xml
@@ -107,5 +114,6 @@
         </description>
         <antcall target="processOneRepository.process" inheritall="true"/>
         <antcall target="processOneRepository.runGradleW" inheritall="true"/>
+        <antcall target="processOneRepository.cleanup" inheritall="true"/>
     </target>
 </project>
