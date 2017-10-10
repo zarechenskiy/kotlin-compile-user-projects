@@ -1,0 +1,111 @@
+<project name="processOneRepository" basedir="." default="process" xmlns:if="ant:if" xmlns:unless="ant:unless">
+    <include file="prepareVersionChanger.xml"/>
+    <include file="utils.xml"/>
+    <target name="oneRepProperties" >
+        <echo>
+            Taken parameters are:
+            git.rep.name = ${git.rep.name}
+            git.rep.url.start = ${git.rep.url.start}
+            git.rep.branch = ${git.rep.branch}
+            git.rep.cmd = ${git.rep.cmd}
+        </echo>
+    </target>
+    <target name="oneRepCheckoutBranch" if="git.rep.branch">
+        <exec dir="${git.rep.name}/" executable="git">
+            <arg value="checkout"/>
+            <arg value="${git.rep.branch}"/>
+        </exec>
+    </target>
+    <target name="oneRepClone" depends="oneRepProperties">
+        <property name="git.rep.url" value="${git.rep.url.start}/${git.rep.name}.git"/>
+        <delete dir="${git.rep.name}"  failonerror="false"/>
+        <mkdir dir="${git.rep.name}"/>
+        <exec dir="." executable="git">
+            <arg value="clone"/>
+            <arg value="${git.rep.url}"/>
+            <arg value="${git.rep.name}" />
+        </exec>
+        <antcall target="processOneRepository.oneRepCheckoutBranch"/>
+    </target>
+    <target name="oneRepKotlinVersionChanging" depends="oneRepClone">
+        <antcall target="prepareVersionChanger.oneRepKotlinVersionChanging">
+            <param name="git.rep.name" value="${git.rep.name}"/>
+            <param name="kotlin.version" value="${kotlin.version}"/>
+        </antcall>
+    </target>
+    <target name="process" depends="oneRepKotlinVersionChanging">
+        <description>
+            Following properties are taken from parent xml
+            - kotlin.version
+            - isWindows
+            Following parameters are expected:
+            - git.rep.name - name of the processed repository
+            - git.rep.url.start - parent url of the processed repository (without name)
+            - git.rep.branch - empty or do not specify for master branch
+        </description>
+    </target>
+    <target name="generateRunGradleWin" if="isWindows" >
+        <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
+        <echo file="${run.gradlew}">call gradlew.bat ${git.rep.cmd} --stacktrace --info</echo>
+        <replace file="${run.gradlew}" token="&quot;"/>
+        <concat>
+            <file name="${run.gradlew}"/>
+        </concat>
+    </target>
+    <target name="generateRunGradleLin" unless="isWindows" >
+        <antcall target="processOneRepository.utils.makeExecutableOnLinux">
+            <param name="param.executable" value="${basedir}/${git.rep.name}/gradlew"/>
+        </antcall>
+        <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
+        <echo file="${run.gradlew}">#!/usr/bin/env bash
+            ./gradlew ${git.rep.cmd} --stacktrace --info</echo>
+        <replace file="${run.gradlew}" token="&quot;"/>
+        <concat>
+            <file name="${run.gradlew}"/>
+        </concat>
+        <antcall target="processOneRepository.utils.makeExecutableOnLinux">
+            <param name="param.executable" value="${run.gradlew}"/>
+        </antcall>
+    </target>
+    <target name="oneRepBuilding" depends="generateRunGradleLin, generateRunGradleWin">
+        <property name="stdout" value="${logs.path}/${git.rep.name}-stdout.txt"/>
+        <property name="stderr" value="${logs.path}/${git.rep.name}-stderr.txt"/>
+        <exec dir="${git.rep.name}/" executable="${run.gradlew}" output="${stdout}" error="${stderr}" resultproperty="gradle.result"/>
+        <echo message="Result of executing gradle commands ${git.rep.cmd} is ${gradle.result}"/>
+        <concat>
+            <file name="${stdout}"/>
+        </concat>
+        <concat>
+            <file name="${stderr}"/>
+        </concat>
+    </target>
+    <target name="runGradleW" depends="oneRepBuilding">
+        <description>
+            Following properties are taken from parent xml
+            - isWindows
+            - exeEnding
+            - log.path
+            Following parameters are expected:
+            - git.rep.name - name of the processed repository
+            - git.rep.cmd - set of gradle commands to execute (separated with a space)
+            This target must be called only after `process` target.
+            Attention: there is no dependency between them `runGradleW` and `process`!
+        </description>
+    </target>
+    <target name="fullProcess">
+        <description>
+            Following properties are taken from parent xml
+            - kotlin.version
+            - isWindows
+            - exeEnding
+            - log.path
+            Following parameters are expected:
+            - git.rep.name - name of the processed repository
+            - git.rep.url.start - parent url of the processed repository (without name)
+            - git.rep.branch - empty or do not specify for master branch
+            - git.rep.cmd - set of gradle commands to execute (separated with a space)
+        </description>
+        <antcall target="processOneRepository.process" inheritall="true"/>
+        <antcall target="processOneRepository.runGradleW" inheritall="true"/>
+    </target>
+</project>

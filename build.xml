@@ -1,117 +1,32 @@
-<project name="antInstall" basedir="." default="runSample">
-    <target name="makeExecutableOnLinux" >
-        <description description="takes param.executable as parameter - full path the file whose permissions are going to be changed"/>
-        <exec dir="." executable="chmod" osfamily="unix" >
-            <arg value="777"/>
-            <arg value="${param.executable}"/>
-        </exec>
-    </target>
-    <target name="oneRepProperties" depends="commonProperties">
-        <echo>
-            Taken parameters are:
-            git.rep.name = ${git.rep.name}
-            git.rep.url.start = ${git.rep.url.start}
-            git.rep.branch = ${git.rep.branch}
-            git.rep.cmd = ${git.rep.cmd}
-        </echo>
-    </target>
-    <target name="oneRepCheckoutBranch" if="git.rep.branch">
-        <exec dir="${git.rep.name}/" executable="git">
-            <arg value="checkout"/>
-            <arg value="${git.rep.branch}"/>
-        </exec>
-    </target>
-    <target name="oneRepClone" depends="oneRepProperties">
-        <property name="git.rep.url" value="${git.rep.url.start}/${git.rep.name}.git"/>
-        <delete dir="${git.rep.name}"  failonerror="false"/>
-        <mkdir dir="${git.rep.name}"/>
-        <exec dir="." executable="git">
-            <arg value="clone"/>
-            <arg value="${git.rep.url}"/>
-            <arg value="${git.rep.name}" />
-        </exec>
-        <antcall target="oneRepCheckoutBranch"/>
-    </target>
-    <target name="oneRepKotlinVersionChanging" depends="oneRepClone">
-        <exec dir="." executable="${changer.executable}" >
-            <arg value="--project"/>
-            <arg value="${git.rep.name}"/>
-            <arg value="--version"/>
-            <arg value="${kotlin.version}"/>
-            <arg value="--repository"/>
-            <arg value="DEV"/>
-        </exec>
-    </target>
-    <target name="generateRunGradleWin" if="isWindows" depends="oneRepKotlinVersionChanging">
-        <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
-        <echo file="${run.gradlew}">call gradlew.bat ${git.rep.cmd} --stacktrace --info</echo>
-        <replace file="${run.gradlew}" token="&quot;"/>
-        <concat>
-            <file name="${run.gradlew}"/>
-        </concat>
-    </target>
-    <target name="generateRunGradleLin" unless="isWindows" depends="oneRepKotlinVersionChanging">
-        <antcall target="makeExecutableOnLinux">
-            <param name="param.executable" value="${basedir}/${git.rep.name}/gradlew"/>
-        </antcall>
-        <property name="run.gradlew" value="${basedir}/${git.rep.name}/run_gradlew${exeEnding}"/>
-        <echo file="${run.gradlew}">#!/usr/bin/env bash
-./gradlew ${git.rep.cmd} --stacktrace --info</echo>
-        <replace file="${run.gradlew}" token="&quot;"/>
-        <concat>
-            <file name="${run.gradlew}"/>
-        </concat>
-        <antcall target="makeExecutableOnLinux">
-            <param name="param.executable" value="${run.gradlew}"/>
-        </antcall>
-    </target>
-    <target name="oneRepBuilding" depends="generateRunGradleLin, generateRunGradleWin">
-        <property name="stdout" value="${logs.path}/${git.rep.name}-stdout.txt"/>
-        <property name="stderr" value="${logs.path}/${git.rep.name}-stderr.txt"/>
-        <exec dir="${git.rep.name}/" executable="${run.gradlew}" output="${stdout}" error="${stderr}" resultproperty="gradle.result"/>
-        <echo message="Result of executing gradle commands ${git.rep.cmd} is ${gradle.result}"/>
-        <concat>
-            <file name="${stdout}"/>
-        </concat>
-        <concat>
-            <file name="${stderr}"/>
-        </concat>
-    </target>
-    <target name="processOneRepository" depends="oneRepKotlinVersionChanging">
-        <description description="takes git.rep.url.start, git.rep.name and git.rep.cmd as parameters"/>
-    </target>
-    <target name="commonProperties">
+<project name="antInstall" basedir="." default="runSample" xmlns:if="ant:if" xmlns:unless="ant:unless">
+    <include file="editPomXml.xml"/>
+    <include file="prepareVersionChanger.xml"/>
+    <include file="processOneRepository.xml"/>
+    <target name="properties">
         <!--<property name="kotlin.version" value="1.2-Beta-eap-28"/>-->
         <echo message="The user projects are going to be compiled against Kotlin `${kotlin.version}`"/>
-        <property name="changer.version" value="0.0.3-4"/>
         <condition property="isWindows" value="true">
             <os family="windows"/>
         </condition>
         <condition property="exeEnding" value=".bat" else="">
             <isset property="isWindows"/>
         </condition>
-        <property name="changer.zip.name" value="kotlin-version-changer-${changer.version}.zip"/>
-        <property name="changer.url" value="https://github.com/h0tk3y/kotlin-version-changer/releases/download/${changer.version}/${changer.zip.name}"/>
-        <property name="changer.local.path" value="kotlin-version-changer-${changer.version}/bin"/>
-        <property name="changer.executable.name" value="kotlin-version-changer${exeEnding}"/>
-        <property name="changer.executable" value="${basedir}/${changer.local.path}/${changer.executable.name}"/>
         <property name="logs.folder" value="logs"/>
         <property name="logs.path" value="${basedir}/${logs.folder}"/>
         <mkdir dir="${logs.path}"/>
     </target>
-    <target name="detectIfChangerDownloaded" depends="commonProperties">
-        <available property="isChangerDownloaded" file="${changer.zip.name}"/>
+    <target name="prepareChanger" depends="properties">
+        <antcall target="prepareVersionChanger.prepare" inheritall="true"/>
     </target>
-    <target name="downloadChanger" depends="detectIfChangerDownloaded" unless="isChangerDownloaded">
-        <get src="${changer.url}" dest="."/>
-    </target>
-    <target name="unzipChanger" depends="downloadChanger">
-        <unzip src="${changer.zip.name}" dest="." overwrite="true"/>
-        <antcall target="makeExecutableOnLinux">
-            <param name="param.executable" value="${changer.executable}"/>
+    <target name="processOneRepository" >
+        <antcall target="processOneRepository.process" inheritall="true" />
+        <property name="pomName" value="${basedir}/${git.rep.name}/pom.xml"/>
+        <antcall target="editPomXml.editPom">
+            <param name="kotlin.version" value="${kotlin.version}"/>
+            <param name="pom.name" value="${pomName}"/>
         </antcall>
     </target>
-    <target  name="runSample" depends="unzipChanger">
+    <target  name="runSample" depends="prepareChanger">
         <!-- Sample how to run processOneRepository task -->
         <antcall target="processOneRepository">
             <param name="git.rep.name" value="kotlin-version-changer"/>
@@ -123,13 +38,55 @@
             <param name="git.rep.name" value="corda"/>
             <param name="git.rep.url.start" value="https://github.com/corda"/>
             <param name="git.rep.branch" value="release-M14"/>
-            <param name="git.rep.cmd" value="clean"/>
+            <param name="git.rep.cmd" value="clean build"/>
         </antcall>
         <antcall target="processOneRepository">
             <param name="git.rep.name" value="lwjgl3"/>
             <param name="git.rep.url.start" value="https://github.com/LWJGL"/>
             <param name="git.rep.branch" value=""/>
             <param name="git.rep.cmd" value="clean build"/>
+        </antcall>
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="kotlin-koans"/>
+            <param name="git.rep.url.start" value="https://github.com/Kotlin"/>
+            <param name="git.rep.branch" value=""/>
+            <param name="git.rep.cmd" value="clean build"/>
+        </antcall>
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="kotlinx.reflect.lite"/>
+            <param name="git.rep.url.start" value="https://github.com/Kotlin"/>
+            <param name="git.rep.branch" value=""/>
+            <param name="git.rep.cmd" value="clean build"/>
+        </antcall>
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="hamkrest"/>
+            <param name="git.rep.url.start" value="https://github.com/npryce"/>
+            <param name="git.rep.branch" value=""/>
+            <param name="git.rep.cmd" value="clean build"/>
+        </antcall>
+        <!--<antcall target="processOneRepository">-->
+            <!--<param name="git.rep.name" value="anko"/>-->
+            <!--<param name="git.rep.url.start" value="https://github.com/Kotlin"/>-->
+            <!--<param name="git.rep.branch" value=""/>-->
+            <!--<param name="git.rep.cmd" value="clean dist"/>-->
+        <!--</antcall>-->
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="jclasslib"/>
+            <param name="git.rep.url.start" value="https://github.com/ingokegel"/>
+            <param name="git.rep.branch" value=""/>
+            <param name="git.rep.cmd" value="clean test"/>
+        </antcall>
+        <!--<antcall target="processOneRepository">-->
+            <!--<param name="git.rep.name" value="DBFlow"/>-->
+            <!--<param name="git.rep.url.start" value="https://github.com/Raizlabs"/>-->
+            <!--<param name="git.rep.branch" value=""/>-->
+            <!--<param name="git.rep.cmd" value="clean test"/>-->
+        <!--</antcall>-->
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="Exposed"/>
+            <param name="git.rep.url.start" value="https://github.com/jetbrains"/>
+            <param name="git.rep.branch" value=""/>
+            <param name="git.rep.cmd" value="clean test"/>
         </antcall>
     </target>
 </project>

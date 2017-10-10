@@ -1,0 +1,12 @@
+<project name="utils" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
+    <target name="makeExecutableOnLinux" >
+        <description>
+            Takes parameter:
+            param.executable - full path the file whose permissions are going to be changed
+        </description>
+        <exec dir="." executable="chmod" osfamily="unix" >
+            <arg value="777"/>
+            <arg value="${param.executable}"/>
+        </exec>
+    </target>
+</project>

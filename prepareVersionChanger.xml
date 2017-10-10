@@ -1,0 +1,57 @@
+<project name="prepareVersionChanger" basedir="." default="prepare" xmlns:if="ant:if" xmlns:unless="ant:unless">
+    <include file="utils.xml"/>
+    <!--<target name="makeExecutableOnLinux" >-->
+        <!--<description>-->
+            <!--Takes parameter:-->
+            <!--param.executable - full path the file whose permissions are going to be changed-->
+        <!--</description>-->
+        <!--<exec dir="." executable="chmod" osfamily="unix" >-->
+            <!--<arg value="777"/>-->
+            <!--<arg value="${param.executable}"/>-->
+        <!--</exec>-->
+    <!--</target>-->
+    <target name="properties">
+        <!--<property name="kotlin.version" value="1.2-Beta-eap-28"/>-->
+        <echo message="The user projects are going to be compiled against Kotlin `${kotlin.version}`"/>
+        <property name="changer.version" value="0.0.3-4"/>
+        <property name="changer.zip.name" value="kotlin-version-changer-${changer.version}.zip"/>
+        <property name="changer.url" value="https://github.com/h0tk3y/kotlin-version-changer/releases/download/${changer.version}/${changer.zip.name}"/>
+        <property name="changer.local.path" value="kotlin-version-changer-${changer.version}/bin"/>
+        <property name="changer.executable.name" value="kotlin-version-changer${exeEnding}"/>
+        <property name="changer.executable" value="${basedir}/${changer.local.path}/${changer.executable.name}"/>
+    </target>
+    <target name="downloadChanger" depends="properties" >
+        <available property="isChangerDownloaded" value="true" file="${changer.zip.name}"/>
+        <get src="${changer.url}" dest="." unless:true="isChangerDownloaded"/>
+    </target>
+    <target name="unzipChanger" depends="downloadChanger">
+        <unzip src="${changer.zip.name}" dest="." overwrite="true"/>
+        <antcall target="prepareVersionChanger.utils.makeExecutableOnLinux">
+            <param name="param.executable" value="${changer.executable}"/>
+        </antcall>
+    </target>
+    <target name="prepare" depends="unzipChanger">
+        <description>
+            Following properties are taken from parent xml
+            - kotlin.version
+            - isWindows
+            - exeEnding
+        </description>
+    </target>
+    <target name="oneRepKotlinVersionChanging" depends="properties">
+        <description>
+            Executes version changer with following expected parameters:
+            - git.rep.name - name of the processed folder where build.gradle is located
+            - kotlin.version
+            It is supposed that version changer is installed already (target `prepare` has been called before)
+        </description>
+        <exec dir="." executable="${changer.executable}" >
+            <arg value="--project"/>
+            <arg value="${git.rep.name}"/>
+            <arg value="--version"/>
+            <arg value="${kotlin.version}"/>
+            <arg value="--repository"/>
+            <arg value="DEV"/>
+        </exec>
+    </target>
+</project>
