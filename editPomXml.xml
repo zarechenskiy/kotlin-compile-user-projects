@@ -7,6 +7,10 @@
                        match="&lt;kotlin\.version&gt;.*&lt;\/kotlin\.version&gt;"
                        replace="&lt;kotlin\.version&gt;${kotlin.version}&lt;\/kotlin\.version&gt;"
                        byline="true" if:true="${isTherePomXml}"/>
+        <replaceregexp file="${pom.name}"
+                       match="&lt;version&gt;.*kotlin\.version}&lt;\/version&gt;"
+                       replace="&lt;version&gt;${kotlin.version}&lt;\/version&gt;"
+                       byline="false" flags="U" if:true="${isTherePomXml}"/>
         <condition property="toAddDevRep" value="true" if:true="${isTherePomXml}">
                 <not><resourcecontains resource="${pom.name}"
                                   substring="kotlin-dev" casesensitive="false"/></not>
