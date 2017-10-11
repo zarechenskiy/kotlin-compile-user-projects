@@ -7,12 +7,10 @@
                        match="&lt;kotlin\.version&gt;.*&lt;\/kotlin\.version&gt;"
                        replace="&lt;kotlin\.version&gt;${kotlin.version}&lt;\/kotlin\.version&gt;"
                        byline="true" if:true="${isTherePomXml}"/>
-        <condition property="isDevRepPresent" value="true" if:true="${isTherePomXml}">
-            <resourcecontains resource="${pom.name}"
-                              substring="kotlin-dev"
-                              casesensitive="false"/>
+        <condition property="toAddDevRep" value="true" if:true="${isTherePomXml}">
+                <not><resourcecontains resource="${pom.name}"
+                                  substring="kotlin-dev" casesensitive="false"/></not>
         </condition>
-        <echo message="isDevRepPresent = ${isDevRepPresent}"/>
         <replaceregexp file="${pom.name}"
                        match="&lt;\/properties&gt;"
                        replace="&lt;\/properties&gt;
@@ -40,6 +38,6 @@
         &lt;\/snapshots&gt;
     &lt;\/pluginRepository&gt;
 &lt;\/pluginRepositories&gt;"
-                       byline="true" unless:true="${isDevRepPresent}"/>
+                       byline="true" if:true="${toAddDevRep}"/>
     </target>
 </project>
