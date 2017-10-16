@@ -3,7 +3,7 @@
     <include file="prepareVersionChanger.xml"/>
     <include file="processOneRepository.xml"/>
     <target name="properties">
-        <!--<property name="kotlin.version" value="1.2-Beta-eap-28"/>-->
+        <property file="version.properties"/>
         <echo message="The user projects are going to be compiled against Kotlin `${kotlin.version}`"/>
         <condition property="isWindows" value="true">
             <os family="windows"/>

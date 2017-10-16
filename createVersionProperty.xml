@@ -1,0 +1,7 @@
+<project name="createProperties" basedir="." default="createProperties" >
+    <target name="createProperties" >
+        <echo message="The user projects are going to be compiled against Kotlin `${kotlin.version}`"/>
+        <!--<property name="kotlin.version" value="1.1.51"/>-->
+        <echo file="version.properties" message="kotlin.version=${kotlin.version}"/>
+    </target>
+</project>
