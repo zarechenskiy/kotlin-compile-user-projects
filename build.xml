@@ -64,24 +64,24 @@
             <param name="git.rep.branch" value=""/>
             <param name="git.rep.cmd" value="clean build"/>
         </antcall>
-        <!--<antcall target="processOneRepository">-->
-            <!--<param name="git.rep.name" value="anko"/>-->
-            <!--<param name="git.rep.url.start" value="https://github.com/Kotlin"/>-->
-            <!--<param name="git.rep.branch" value=""/>-->
-            <!--<param name="git.rep.cmd" value="clean dist"/>-->
-        <!--</antcall>-->
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="anko"/>
+            <param name="git.rep.url.start" value="https://github.com/Kotlin"/>
+            <param name="git.rep.branch" value=""/>
+            <param name="git.rep.cmd" value="clean dist"/>
+        </antcall>
         <antcall target="processOneRepository">
             <param name="git.rep.name" value="jclasslib"/>
             <param name="git.rep.url.start" value="https://github.com/ingokegel"/>
             <param name="git.rep.branch" value=""/>
             <param name="git.rep.cmd" value="clean test"/>
         </antcall>
-        <!--<antcall target="processOneRepository">-->
-            <!--<param name="git.rep.name" value="DBFlow"/>-->
-            <!--<param name="git.rep.url.start" value="https://github.com/Raizlabs"/>-->
-            <!--<param name="git.rep.branch" value=""/>-->
-            <!--<param name="git.rep.cmd" value="clean test"/>-->
-        <!--</antcall>-->
+        <antcall target="processOneRepository">
+            <param name="git.rep.name" value="DBFlow"/>
+            <param name="git.rep.url.start" value="https://github.com/Raizlabs"/>
+            <param name="git.rep.branch" value=""/>
+            <param name="git.rep.cmd" value="clean test"/>
+        </antcall>
         <antcall target="processOneRepository">
             <param name="git.rep.name" value="Exposed"/>
             <param name="git.rep.url.start" value="https://github.com/jetbrains"/>
