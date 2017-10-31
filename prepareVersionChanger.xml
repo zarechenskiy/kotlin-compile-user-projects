@@ -1,15 +1,5 @@
 <project name="prepareVersionChanger" basedir="." default="prepare" xmlns:if="ant:if" xmlns:unless="ant:unless">
     <include file="utils.xml"/>
-    <!--<target name="makeExecutableOnLinux" >-->
-        <!--<description>-->
-            <!--Takes parameter:-->
-            <!--param.executable - full path the file whose permissions are going to be changed-->
-        <!--</description>-->
-        <!--<exec dir="." executable="chmod" osfamily="unix" >-->
-            <!--<arg value="777"/>-->
-            <!--<arg value="${param.executable}"/>-->
-        <!--</exec>-->
-    <!--</target>-->
     <target name="properties">
         <!--<property name="kotlin.version" value="1.2-Beta-eap-28"/>-->
         <echo message="The user projects are going to be compiled against Kotlin `${kotlin.version}`"/>
@@ -45,6 +35,11 @@
             - kotlin.version
             It is supposed that version changer is installed already (target `prepare` has been called before)
         </description>
+        <echo>
+            Received parameters:
+            kotlin.version = ${kotlin.version}
+            git.rep.name = ${git.rep.name}
+        </echo>
         <exec dir="." executable="${changer.executable}" >
             <arg value="--project"/>
             <arg value="${git.rep.name}"/>
