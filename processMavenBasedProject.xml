@@ -1,7 +1,6 @@
-<project name="editPomXml" basedir="." default="editPom" xmlns:if="ant:if" xmlns:unless="ant:unless">
+<project name="editPomXml" basedir="." default="processMavenBasedProject" xmlns:if="ant:if" xmlns:unless="ant:unless">
     <target name="editPom" >
         <description description="Takes `kotlin.version` and `pom.name` as parameters"/>
-        <property name="pom.name" value="${basedir}/mavenBasedProject/pom.xml"/>
         <available property="isTherePomXml" file="${pom.name}" value="true"/>
         <replaceregexp file="${pom.name}"
                        match="&lt;kotlin\.version&gt;.*&lt;\/kotlin\.version&gt;"
@@ -43,5 +42,15 @@
     &lt;\/pluginRepository&gt;
 &lt;\/pluginRepositories&gt;"
                        byline="true" if:true="${toAddDevRep}"/>
+    </target>
+    <target name="processMavenBasedProject">
+        <description>
+            Takes parameter `project.folder` - the name of folder where the processed project is located
+        </description>
+        <property name="pomName" value="${basedir}/${project.folder}/pom.xml"/>
+        <antcall target="editPomXml.editPom">
+            <param name="kotlin.version" value="${kotlin.version}"/>
+            <param name="pom.name" value="${pomName}"/>
+        </antcall>
     </target>
 </project>

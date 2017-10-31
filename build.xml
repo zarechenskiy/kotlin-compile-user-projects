@@ -1,5 +1,5 @@
 <project name="antInstall" basedir="." default="runSample" xmlns:if="ant:if" xmlns:unless="ant:unless">
-    <include file="editPomXml.xml"/>
+    <include file="processMavenBasedProject.xml"/>
     <include file="prepareVersionChanger.xml"/>
     <include file="processOneRepository.xml"/>
     <target name="properties">
@@ -21,7 +21,7 @@
     <target name="processOneRepository" >
         <antcall target="processOneRepository.process" inheritall="true" />
         <property name="pomName" value="${basedir}/${git.rep.name}/pom.xml"/>
-        <antcall target="editPomXml.editPom">
+        <antcall target="processMavenBasedProject.editPom">
             <param name="kotlin.version" value="${kotlin.version}"/>
             <param name="pom.name" value="${pomName}"/>
         </antcall>
