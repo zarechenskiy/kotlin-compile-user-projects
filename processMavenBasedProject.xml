@@ -43,12 +43,16 @@
 &lt;\/pluginRepositories&gt;"
                        byline="true" if:true="${toAddDevRep}"/>
     </target>
-    <target name="processMavenBasedProject">
+    <target name="properties">
+        <property file="version.properties"/>
+        <echo message="The user projects are going to be compiled against Kotlin `${kotlin.version}`"/>
+    </target>
+    <target name="processMavenBasedProject" depends="properties">
         <description>
             Takes parameter `project.folder` - the name of folder where the processed project is located
         </description>
         <property name="pomName" value="${basedir}/${project.folder}/pom.xml"/>
-        <antcall target="editPomXml.editPom">
+        <antcall target="editPom">
             <param name="kotlin.version" value="${kotlin.version}"/>
             <param name="pom.name" value="${pomName}"/>
         </antcall>
