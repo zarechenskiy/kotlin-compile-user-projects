@@ -1,0 +1,28 @@
+<project name="processGradleBasedProject" basedir="." default="processGradleBasedProject" xmlns:if="ant:if" xmlns:unless="ant:unless">
+    <include file="prepareVersionChanger.xml"/>
+    <target name="properties">
+        <property file="version.properties"/>
+        <echo message="The user projects are going to be compiled against Kotlin `${kotlin.version}`"/>
+        <condition property="isWindows" value="true">
+            <os family="windows"/>
+        </condition>
+        <condition property="exeEnding" value=".bat" else="">
+            <isset property="isWindows"/>
+        </condition>
+    </target>
+    <target name="prepareChanger" depends="properties">
+        <antcall target="prepareVersionChanger.prepare" inheritall="true"/>
+    </target>
+    <target name="changeKotlinVersion" depends="prepareChanger">
+        <antcall target="prepareVersionChanger.oneRepKotlinVersionChanging">
+            <param name="git.rep.name" value="${project.folder}"/>
+            <param name="kotlin.version" value="${kotlin.version}"/>
+        </antcall>
+    </target>
+    <target name="processGradleBasedProject" depends="changeKotlinVersion">
+        <description>
+            Takes parameter `project.folder` - the name of folder where the processed project is located
+        </description>
+    </target>
+
+</project>
