@@ -39,6 +39,7 @@
             Received parameters:
             kotlin.version = ${kotlin.version}
             git.rep.name = ${git.rep.name}
+            project.freeCompilerArgs = ${project.freeCompilerArgs}
         </echo>
         <exec dir="." executable="${changer.executable}" >
             <arg value="--project"/>
@@ -47,6 +48,8 @@
             <arg value="${kotlin.version}"/>
             <arg value="--repository"/>
             <arg value="DEV"/>
+            <arg value="--freeCompilerArgs"/>
+            <arg value="${project.freeCompilerArgs}"/>
         </exec>
     </target>
 </project>

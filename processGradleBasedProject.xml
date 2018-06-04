@@ -17,6 +17,7 @@
         <antcall target="prepareVersionChanger.oneRepKotlinVersionChanging">
             <param name="git.rep.name" value="${project.folder}"/>
             <param name="kotlin.version" value="${kotlin.version}"/>
+            <param name="project.freeCompilerArgs" value="${project.freeCompilerArgs}"/>
         </antcall>
     </target>
     <target name="processGradleBasedProject" depends="changeKotlinVersion">
