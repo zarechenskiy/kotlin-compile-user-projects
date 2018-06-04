@@ -3,7 +3,7 @@
     <target name="properties">
         <!--<property name="kotlin.version" value="1.2-Beta-eap-28"/>-->
         <echo message="The user projects are going to be compiled against Kotlin `${kotlin.version}`"/>
-        <property name="changer.version" value="0.0.3-4"/>
+        <property name="changer.version" value="0.0.4"/>
         <property name="changer.zip.name" value="kotlin-version-changer-${changer.version}.zip"/>
         <property name="changer.url" value="https://github.com/h0tk3y/kotlin-version-changer/releases/download/${changer.version}/${changer.zip.name}"/>
         <property name="changer.local.path" value="kotlin-version-changer-${changer.version}/bin"/>
