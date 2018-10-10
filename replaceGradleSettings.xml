@@ -1,0 +1,15 @@
+<project name="replaceGradleSettings" basedir="." default="replaceGradleSettings" xmlns:if="ant:if" xmlns:unless="ant:unless">
+  <target name="replaceGradleSettings">
+    <replaceregexp if:set="kotlin.version" unless:blank="${kotlin.version}"
+                   file="${project.folder}/gradle.properties"
+                   match="kotlin_version=(.*)"
+                   replace="kotlin_version=${kotlin.version}"
+                   byline="true"/>
+
+    <replaceregexp if:set="kotlin.freeCompilerArgs" unless:blank="${kotlin.freeCompilerArgs}"
+                   file="${project.folder}/gradle.properties"
+                   match="kotlin_free_args=(.*)"
+                   replace="kotlin_free_args=${kotlin.freeCompilerArgs}"
+                   byline="true"/>
+  </target>
+</project>
